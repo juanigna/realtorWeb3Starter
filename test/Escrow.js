@@ -27,6 +27,7 @@ describe('Escrow', () => {
             realEstate.address,
             seller.address,
             inspector.address,
+            buyer.address
             /*lender.address*/
         )
 
@@ -68,12 +69,12 @@ describe('Escrow', () => {
         })
 
         it('Returns buyer', async () => {
-            const result = await escrow.buyer(1)
+            const result = await escrow.buyerList(1)
             expect(result).to.be.equal(buyer.address)
         })
 
         it('Returns purchase price', async () => {
-            const result = await escrow.purchasePrice(1)
+            const result = await escrow.itemPrice(1)
             expect(result).to.be.equal(tokens(10))
         })
 
@@ -106,18 +107,24 @@ describe('Escrow', () => {
         })
 
         it('Updates inspection status', async () => {
-            const result = await escrow.inspectionPassed(1)
+            const result = await escrow.inspectionStatus(1)
             expect(result).to.be.equal(true)
         })
     })
 
     describe('Approval', () => {
         beforeEach(async () => {
-            let transaction = await escrow.connect(buyer).approveSale(1)
+            let transaction = await escrow.connect(inspector).updateInspectionStatus(1, true)
+            await transaction.wait()
+
+            transaction = await escrow.connect(buyer).approveSale(1)
             await transaction.wait()
 
             transaction = await escrow.connect(seller).approveSale(1)
             await transaction.wait()
+
+            /*transaction = await escrow.connect(lender).approveSale(1)
+            await transaction.wait()*/
 
             /*transaction = await escrow.connect(lender).approveSale(1)
             await transaction.wait()*/
@@ -143,11 +150,6 @@ describe('Escrow', () => {
 
             transaction = await escrow.connect(seller).approveSale(1)
             await transaction.wait()
-
-            transaction = await escrow.connect(lender).approveSale(1)
-            await transaction.wait()
-
-            await lender.sendTransaction({ to: escrow.address, value: tokens(5) })
 
             transaction = await escrow.connect(seller).finalizeSale(1)
             await transaction.wait()

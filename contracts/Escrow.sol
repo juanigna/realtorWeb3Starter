@@ -13,25 +13,45 @@ contract Escrow {
     address public nftAddress;
     address payable public seller;
     address public inspector;
-    //address public lender; LENDER is OPTIONAL
+    address public buyer;
+    
 
     // modifier onlyBuyer => verify for "Only buyer call this method"
-   
+    modifier onlyBuyer{
+        require(msg.sender == buyer, "Only buyer call this method");
+        _;
+    }
     // modifier onlySeller => verify for "Only seller call this method"
-
+    modifier onlySeller{
+        require(msg.sender == seller, "Only seller call this method");
+        _;
+    }
     // modifier onlyInspector => verify for "Only inspector call this method"
-    
+    modifier onlyInspector{
+        require(msg.sender == inspector, "Only inspector call this method");
+        _;
+    }
     //mappings *isListed**purchuasePrice**escrowAmount**buyer**inspectionPassed*
+    mapping(uint256 => bool) public isListed;
+    mapping(uint256 => uint256) public itemPrice;
+    mapping(uint256 => uint256) public escrowAmount;
+    mapping(uint256 => address) public buyerList;
+    mapping(uint256 => bool) public inspectionPassed;
+    mapping(uint256 => mapping(address => bool)) public approval;
+    mapping(uint256 => bool) public inspectionStatus;
+
     constructor(
         address _nftAddress,
         address payable _seller,
         address _inspector,
-        address _lender
+        address _buyer
+        
     ) {
         nftAddress = _nftAddress;
         seller = _seller;
         inspector = _inspector;
-        lender = _lender;
+        buyer = _buyer;
+        
     }
 
     function list(
@@ -44,23 +64,28 @@ contract Escrow {
         IERC721(nftAddress).transferFrom(msg.sender, address(this), _nftID);
 
         isListed[_nftID] = true;
-        purchasePrice[_nftID] = _purchasePrice;
+        itemPrice[_nftID] = _purchasePrice;
         escrowAmount[_nftID] = _escrowAmount;
-        buyer[_nftID] = _buyer;
+        buyerList[_nftID] = _buyer;
     }
             // Put Under Contract (only buyer - payable escrow)   
-    function depositEarnest//complete
+    function depositEarnest(uint256 _nftId) public payable onlyBuyer{
+        require(msg.value >= escrowAmount[_nftId]);
+        payable(address(this)).transfer(escrowAmount[_nftId]); //PREGUNTAR SI VA
+    }
 
 
     // Update Inspection Status (only inspector)
-    function updateInspectionStatus//complete *renember use onlyInspector*
+    function updateInspectionStatus(uint256 _nftId, bool _status) public onlyInspector{
+        inspectionStatus[_nftId] = _status;
+    } 
     
 
     // Approve Sale
-    function approveSale // complete
-    
-    (uint256 _nftID) public {
-        approval[_nftID][msg.sender] = true;
+    function approveSale(uint256 _nftId) public {
+        require(inspectionStatus[_nftId] == true, "Inspection status is off");
+        inspectionPassed[_nftId] = true;
+        approval[_nftId][msg.sender] = true;
     }
 
     // Finalize Sale
@@ -69,19 +94,25 @@ contract Escrow {
     // -> Require funds to be correct amount
     // -> Transfer NFT to buyer
     // -> Transfer Funds to Seller
-    function finalizeSale //complete
+    function finalizeSale(uint256 _nftId) public payable{
+        require(inspectionPassed[_nftId] = true, "Approve test failed");
+        require(escrowAmount[_nftId] == itemPrice[_nftId], "Wrong amount on ethers");
+        IERC721(nftAddress).transferFrom(seller, buyer, _nftId);
+        seller.transfer(escrowAmount[_nftId]);
+        escrowAmount[_nftId] = 0;
+    } //complete
         
     // Cancel Sale (handle earnest deposit)
     // -> if inspection status is not approved, then refund, otherwise send to seller
-    function cancelSale // complete
+    function cancelSale() public {
+
+    }
 
     //implement a special receive function in order to receive funds and increase the balance
     receive() external payable {}
 
             //function getBalance to check the current balance
-    function getBalance() //completepublic view returns (uint256) {
-        
-
-
-
+    function getBalance() public view returns (uint256) {
+        return address(this).balance;
+    }
 }

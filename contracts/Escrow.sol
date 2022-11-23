@@ -37,8 +37,8 @@ contract Escrow {
     mapping(uint256 => uint256) public escrowAmount;
     mapping(uint256 => address) public buyerList;
     mapping(uint256 => bool) public inspectionPassed;
-    mapping(uint256 => mapping(address => bool)) public approval;
     mapping(uint256 => bool) public inspectionStatus;
+    mapping(uint256 => mapping(address => bool)) public approval;
 
     constructor(
         address _nftAddress,
@@ -96,7 +96,7 @@ contract Escrow {
     // -> Transfer Funds to Seller
     function finalizeSale(uint256 _nftId) public payable{
         require(inspectionPassed[_nftId] = true, "Approve test failed");
-        require(escrowAmount[_nftId] == itemPrice[_nftId], "Wrong amount on ethers");
+        require(msg.value >= escrowAmount[_nftId], "Wrong amount on ethers");
         IERC721(nftAddress).transferFrom(seller, buyer, _nftId);
         seller.transfer(escrowAmount[_nftId]);
         escrowAmount[_nftId] = 0;

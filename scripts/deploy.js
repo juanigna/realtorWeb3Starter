@@ -17,21 +17,21 @@ async function main() {
 
   // Deploy RealEstate.sol
   // Deploy RealEstate.sol
-  const RealEstate = await ethers.getContractFactory("RealEstate");/* complete *use await & ethers**/ 
-  const realEstate = await RealEstate.deploy();/*complete *use deploy **/ 
-  await realEstate.deployed();/*complete*/ /*use instead deployed*/
+  const RealEstate = await ethers.getContractFactory("RealEstate");
+  const realEstate = await RealEstate.deploy();
+  await realEstate.deployed();
 
   console.log(`Deployed Real Estate Contract at: ${realEstate.address}`)
   console.log(`Minting 3 properties...\n`)
 
   for (let i = 0; i < 3; i++) {
     const transaction = await realEstate.connect(seller).mint(`https://ipfs.io/ipfs/QmQVcpsjrA6cr1iJjZAodYwmPekYgbnXGo4DFubJiLc2EB/${i + 1}.json`)  //complete **use function connect and mint and the IFPS link**
-    await transaction.wait(); //complete 
+    await transaction.wait(); 
   }
 
   // Deploy Escrow.sol
   const Escrow = await ethers.getContractFactory("Escrow");
-  const escrow = await Escrow.deploy(realEstate.address, seller.address, inspector.address);/*complete*/
+  const escrow = await Escrow.deploy(realEstate.address, seller.address, inspector.address);
   await escrow.deployed(); 
 
   console.log(`Deployed Escrow Contract at: ${escrow.address}`)

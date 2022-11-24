@@ -96,10 +96,13 @@ contract Escrow {
         require(approval[_nftId][buyerList[_nftId]] == true, "The buyer is not approved");
         require(approval[_nftId][seller] == true, "The seller is not approved");
         require(escrowAmount[_nftId] >= itemPrice[_nftId], "Wrong amount on ethers");
+
+        isListed[_nftId] = false;
+
         IERC721(nftAddress).transferFrom(address(this), buyerList[_nftId], _nftId);
         escrowAmount[_nftId] = 0;
         seller.transfer(getBalance());
-    } //complete
+    }
         
     // Cancel Sale (handle earnest deposit)
     // -> if inspection status is not approved, then refund, otherwise send to seller

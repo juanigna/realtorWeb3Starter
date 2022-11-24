@@ -26,8 +26,7 @@ describe('Escrow', () => {
         escrow = await Escrow.deploy(
             realEstate.address,
             seller.address,
-            inspector.address,
-            buyer.address
+            inspector.address
             /*lender.address*/
         )
 
@@ -107,7 +106,7 @@ describe('Escrow', () => {
         })
 
         it('Updates inspection status', async () => {
-            const result = await escrow.inspectionStatus(1)
+            const result = await escrow.inspectionPassed(1)
             expect(result).to.be.equal(true)
         })
     })
@@ -139,7 +138,7 @@ describe('Escrow', () => {
 
     describe('Sale', () => {
         beforeEach(async () => {
-            let transaction = await escrow.connect(buyer).depositEarnest(1, { value: tokens(5) })
+            let transaction = await escrow.connect(buyer).depositEarnest(1, { value: tokens(10) })
             await transaction.wait()
 
             transaction = await escrow.connect(inspector).updateInspectionStatus(1, true)

@@ -91,7 +91,7 @@ contract Escrow {
     // -> Require funds to be correct amount
     // -> Transfer NFT to buyer
     // -> Transfer Funds to Seller
-    function finalizeSale(uint256 _nftId) public {
+    function finalizeSale(uint256 _nftId) public onlyInspector {
         require(inspectionPassed[_nftId] = true, "Approve test failed");
         require(approval[_nftId][buyerList[_nftId]] == true, "The buyer is not approved");
         require(approval[_nftId][seller] == true, "The seller is not approved");

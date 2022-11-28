@@ -18,42 +18,44 @@ const Home = ({ home, provider, account, escrow, togglePop }) => {
 
     const fetchDetails = async () => {
         // -- Buyer
+        //call different solidty functions from escrow with its home ID
 
-        const buyer = await escrow.buyer(home.id)
-        setBuyer(buyer)
+        const buyer = await escrow.buyerList(home.id)
+        setBuyer(buyer) // Test Account 1 en mi metamask (....2266)
 
         const hasBought = await escrow.approval(home.id, buyer)
         setHasBought(hasBought)
 
         // -- Seller
 
-        const seller = await escrow.seller()
-        setSeller(seller)
+        const seller = await escrow.seller();
+        setSeller(seller)// Test Account 2 en mi metamask (....79c98)
 
         const hasSold = await escrow.approval(home.id, seller)
         setHasSold(hasSold)
 
         // -- Lender
 
-        const lender = await escrow.lender()
-        setLender(lender)
+        const lender = await escrow.lender();
+        setLender(lender)// Test Account 3 en mi metamask (....b906)
 
         const hasLended = await escrow.approval(home.id, lender)
         setHasLended(hasLended)
 
         // -- Inspector
 
-        const inspector = await escrow.inspector()
-        setInspector(inspector)
-
+        const inspector = await escrow.inspector();
+        setInspector(inspector)// Test Account 0 en mi metamask (....293bc)
+        
         const hasInspected = await escrow.inspectionPassed(home.id)
         setHasInspected(hasInspected)
     }
 
     const fetchOwner = async () => {
+        
         if (await escrow.isListed(home.id)) return
 
-        const owner = await escrow.buyer(home.id)
+        const owner = await escrow.buyerList(home.id)
         setOwner(owner)
     }
 
@@ -115,7 +117,9 @@ const Home = ({ home, provider, account, escrow, togglePop }) => {
         fetchOwner()
     }, [hasSold])
 
-    return (
+    
+
+    return (    
         <div className="home">
             <div className='home__details'>
                 <div className="home__image">
@@ -187,7 +191,9 @@ const Home = ({ home, provider, account, escrow, togglePop }) => {
                 </button>
             </div>
         </div >
-    );
+    )
+    ;
 }
+
 
 export default Home;
